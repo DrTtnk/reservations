@@ -29,7 +29,7 @@ module.exports = {
             },
         }],
 
-        "import-newlines/enforce": [ E, { "items": 2, "semi": true, forceSingleLine: true } ],
+        "import-newlines/enforce": [ E, { "items": 1, "semi": true, forceSingleLine: true } ],
 
         "no-trailing-spaces"                  : E,
         "align-assignments/align-assignments" : [E, { "requiresOnly": false } ],

@@ -4,11 +4,16 @@ import {
     function as F,
     taskEither as TE,
 } from "fp-ts";
-import S       from "sequelize";
+import S          from "sequelize";
 
-import * as TG from "./types";
+import { config } from "./Config";
+import * as TG    from "./Types";
 
-const sequelize = new S.Sequelize(`sqlite::memory:`);
+const db = config.database;
+
+const sequelize = config.env === `test`
+    ? new S.Sequelize(`sqlite::memory:`)
+    : new S.Sequelize(`postgres://${db.user}:${db.password}@${db.host}:${db.port}/${db.database}`);
 
 export const Users = sequelize.define<S.Model<TG.User>>(`user`, {
     id       : { type: S.INTEGER, primaryKey: true, autoIncrement: true },
@@ -20,7 +25,7 @@ export const Users = sequelize.define<S.Model<TG.User>>(`user`, {
 export const Reservations = sequelize.define<S.Model<TG.Reservation>>(`reservation`, {
     id        : { type: S.INTEGER, primaryKey: true, autoIncrement: true },
     userId    : { type: S.INTEGER, allowNull: false },
-    date      : { type: S.DATE,    allowNull: false },
+    date      : { type: S.STRING,  allowNull: false },
     time      : { type: S.STRING,  allowNull: false },
     partySize : { type: S.INTEGER, allowNull: false },
 });

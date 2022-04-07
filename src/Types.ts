@@ -1,13 +1,14 @@
-import * as te from "io-ts-extra";
-import * as ts from "io-ts";
-import * as tb from "ts-toolbelt";
+import * as ts     from "io-ts";
+import * as moment from "moment";
+import * as tb     from "ts-toolbelt";
 
-import * as U  from "./utils";
+import * as U      from "./Utils";
 
-export const EmailCodec = U.Narrow(`Email`, `string`, s => !!s.match(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/));
-export const ReservationTime = U.Narrow(`ReservationTime`, `string`, s => s.endsWith(`:00`) && s >= `19:00` && s <= `23:00`);
 export const Positive = U.Narrow(`PositiveInt`, `number`, n => n >= 0);
+export const DateString = U.Narrow(`DateString`, `string`, s => moment(s, `YYYY-MM-DD`).isValid());
+export const EmailCodec = U.Narrow(`Email`, `string`, s => !!s.match(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/));
 export const StrictPositive = U.Narrow(`StrictPositive`, `number`, n => n > 0);
+export const ReservationTime = U.Narrow(`ReservationTime`, `string`, s => s.endsWith(`:00`) && s >= `19:00` && s <= `23:00`);
 
 export type Email = ts.TypeOf<typeof EmailCodec>;
 export type Positive = ts.TypeOf<typeof Positive>;
@@ -20,7 +21,7 @@ export const UserCodec = ts.strict({
 });
 
 export const ReservationCodec = ts.strict({
-    date      : ts.string,
+    date      : DateString,
     time      : ReservationTime,
     partySize : StrictPositive,
 });
@@ -30,13 +31,14 @@ export const NewReservationCodec = ts.strict({
     userId      : ts.number,
 });
 
-export const GetReservationsCodec = te.sparseType({
+export const GetReservationsCodec = ts.partial({
+    userId     : ts.number,
     startDate  : ts.string,
     endDate    : ts.string,
-    pagination : te.optional(ts.strict({
+    pagination : ts.strict({
         page    : Positive,
         perPage : StrictPositive,
-    })),
+    }),
 });
 
 export type UserData = ts.TypeOf<typeof UserCodec>;
